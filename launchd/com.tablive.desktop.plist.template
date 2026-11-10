@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Tab Live desktop helper. A LaunchAgent that loads into the agent user's GUI session
+     whenever that user is logged in, and captures the screen only while someone watches. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.tablive.desktop</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__APP_DIR__/build/Tab Live Capture.app/Contents/MacOS/tab-live-capture</string>
+  </array>
+  <key>LimitLoadToSessionType</key><string>Aqua</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>LowPriorityIO</key><true/>
+  <key>Nice</key><integer>5</integer>
+  <key>StandardOutPath</key><string>__LOG_DIR__/desktop.log</string>
+  <key>StandardErrorPath</key><string>__LOG_DIR__/desktop.log</string>
+</dict>
+</plist>

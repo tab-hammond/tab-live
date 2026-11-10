@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Tab Live</title>
+<meta name="theme-color" content="#0a0c11">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tab Live">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="login" class="login" hidden>
+  <div class="login-card">
+    <img src="icons/icon-192.png" alt="" class="login-logo">
+    <h1>Tab Live</h1>
+    <p>Enter the access code to watch.</p>
+    <form id="loginForm" autocomplete="off">
+      <input id="tokenInput" type="password" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Access code" aria-label="Access code">
+      <button type="submit">Open</button>
+    </form>
+    <p class="login-err" id="loginErr" hidden>That code didn't work.</p>
+  </div>
+</div>
+
+<div id="app" class="app" hidden>
+  <header class="top">
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" class="brand-logo">
+      <div class="brand-text"><span class="brand-name" id="brandName">Tab</span><span class="brand-sub">Live</span></div>
+    </div>
+    <div class="top-right">
+      <div class="pill" id="statusPill"><span class="dot"></span><span id="statusText">Connecting</span></div>
+      <button class="icon-btn" id="viewersBtn" title="Who's watching"><svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><span id="viewersCount">1</span></button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="pane tabs-pane" id="tabsPane">
+      <div class="pane-head">
+        <h2>Tabs <span class="count" id="tabCount">0</span></h2>
+        <button class="chip toggle on" id="followBtn" title="Follow the tab Tab is working in"><span class="led"></span>Follow</button>
+      </div>
+      <ul class="tab-list" id="tabList"></ul>
+    </aside>
+
+    <section class="stage">
+      <div class="chromebar">
+        <img class="fav" id="curFav" alt="">
+        <div class="cur-text">
+          <div class="cur-title" id="curTitle">Waiting for the browser…</div>
+          <div class="cur-url" id="curUrl"></div>
+        </div>
+        <div class="spinner" id="curSpin" hidden></div>
+      </div>
+
+      <div class="screen-wrap" id="screenWrap">
+        <canvas id="screen" tabindex="0" aria-label="Live view of the browser"></canvas>
+        <div class="badge-row">
+          <span class="badge live" id="liveBadge"><span class="dot"></span>LIVE</span>
+          <span class="badge" id="statBadge">— fps</span>
+        </div>
+        <div class="overlay" id="idleOverlay" hidden>
+          <div class="overlay-card">
+            <div class="moon"></div>
+            <h3>Browser is resting</h3>
+            <p id="idleText">This view lights up the moment it starts again.</p>
+          </div>
+        </div>
+        <div class="overlay soft" id="bgOverlay" hidden>
+          <div class="overlay-card small">
+            <h3>Background tab</h3>
+            <p>Nothing is painting here right now. Take over to bring it to the front.</p>
+          </div>
+        </div>
+        <div class="control-banner" id="controlBanner" hidden><span class="dot"></span><span id="controlText">You're in control</span></div>
+        <div class="replay-badge" id="replayBadge" hidden>REWIND <span id="replayTime"></span></div>
+      </div>
+
+      <div class="controls">
+        <div class="seg" id="viewSeg">
+          <button data-view="browser" class="on">Browser</button>
+          <button data-view="desktop">Desktop</button>
+        </div>
+        <div class="controls-right">
+          <button class="btn ghost" id="rewindBtn" title="Rewind the last minutes"><svg viewBox="0 0 24 24"><path d="M11 6v12L2.5 12 11 6Zm10 0v12l-8.5-6L21 6Z"/></svg><span>Rewind</span></button>
+          <button class="btn ghost" id="fsBtn" title="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          <button class="btn take" id="takeBtn"><svg viewBox="0 0 24 24"><path d="M9 3v9.6l-1.6-1.6a1.9 1.9 0 0 0-2.7 2.7l5.2 5.5A6 6 0 0 0 14.3 21H15a5 5 0 0 0 5-5v-4.5a1.75 1.75 0 0 0-3.5 0V11a1.75 1.75 0 0 0-3.5 0v-.5a1.75 1.75 0 0 0-3.5 0V3a1.75 1.75 0 0 0-3.5 0Z"/></svg><span id="takeText">Take over</span></button>
+        </div>
+      </div>
+
+      <div class="drive-bar" id="driveBar" hidden>
+        <button class="icon-btn" data-nav="back" title="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></button>
+        <button class="icon-btn" data-nav="forward" title="Forward"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></button>
+        <button class="icon-btn" data-nav="reload" title="Reload"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></button>
+        <form id="urlForm" class="url-form"><input id="urlInput" placeholder="Go to address or search" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"></form>
+        <button class="icon-btn" id="kbBtn" title="Keyboard"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10h1M9 10h1M12 10h1M15 10h1M18 10h1M7 14h10" stroke="currentColor" stroke-width="2"/></svg></button>
+        <input id="kbInput" class="kb-input" autocapitalize="off" autocorrect="off" spellcheck="false" aria-hidden="true">
+      </div>
+
+      <div class="replay-bar" id="replayBar" hidden>
+        <button class="icon-btn" id="playBtn" title="Play"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4l13 8-13 8V4Z"/></svg></button>
+        <input type="range" id="replaySlider" min="0" max="0" value="0">
+        <button class="chip" id="speedBtn">4×</button>
+        <button class="chip live-chip" id="toLiveBtn"><span class="dot"></span>Live</button>
+      </div>
+
+      <div class="mobile-switch" id="mobileSwitch">
+        <button data-pane="feed" class="on">Activity</button>
+        <button data-pane="tabs">Tabs <span class="count" id="tabCount2">0</span></button>
+      </div>
+    </section>
+
+    <aside class="pane feed-pane" id="feedPane">
+      <div class="pane-head">
+        <h2>Activity</h2>
+        <div class="filters" id="filters">
+          <button data-f="all" class="chip on">All</button>
+          <button data-f="nav" class="chip">Pages</button>
+          <button data-f="error" class="chip">Errors <span class="count err" id="errCount" hidden>0</span></button>
+          <button data-f="net" class="chip">Network</button>
+        </div>
+      </div>
+      <ul class="feed" id="feed"></ul>
+    </aside>
+  </main>
+
+  <div class="sheet" id="viewersSheet" hidden>
+    <div class="sheet-card">
+      <h3>Watching now</h3>
+      <ul id="viewersList"></ul>
+      <div class="sheet-meta" id="sheetMeta"></div>
+      <button class="btn ghost" id="sheetClose">Close</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

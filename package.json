@@ -1,0 +1,15 @@
+{
+  "name": "tab-live",
+  "version": "1.0.0",
+  "description": "Self-hosted live view for an AI agent's Chrome: real-time screencast, tab list, activity feed, take-over and rewind. Like a hosted browser live view, but on your own machine.",
+  "type": "module",
+  "main": "server.js",
+  "bin": { "tab-live": "server.js" },
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check lib/cdp.js && node --check lib/browser.js && node --check public/app.js"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "dependencies": { "ws": "^8.18.0" }
+}
