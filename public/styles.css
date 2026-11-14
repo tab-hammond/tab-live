@@ -192,3 +192,9 @@ body.fs .screen-wrap{border-radius:0;border:0;height:100%;aspect-ratio:auto}
 body.fs .controls{position:fixed;bottom:calc(10px + var(--safe-b));right:10px;z-index:30;opacity:.85}
 body.fs .controls .seg{display:none}
 body.fs .drive-bar,body.fs .replay-bar{position:fixed;bottom:calc(60px + var(--safe-b));left:10px;right:10px;z-index:30}
+
+/* exit-full-screen button: always visible in full screen, big enough to hit without Escape */
+.fs-exit{display:none}
+body.fs .fs-exit{display:flex;align-items:center;gap:8px;position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:50;min-height:48px;padding:0 18px;border-radius:24px;border:1px solid rgba(255,255,255,.25);background:rgba(20,20,24,.82);color:#fff;font:600 15px/1 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.fs .fs-exit:hover,body.fs .fs-exit:focus-visible{background:rgba(40,40,48,.95);outline:2px solid #fff;outline-offset:2px}
+body.fs .fs-exit svg{width:20px;height:20px}

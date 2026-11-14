@@ -91,7 +91,7 @@
         </div>
         <div class="controls-right">
           <button class="btn ghost" id="rewindBtn" title="Rewind the last minutes"><svg viewBox="0 0 24 24"><path d="M11 6v12L2.5 12 11 6Zm10 0v12l-8.5-6L21 6Z"/></svg><span>Rewind</span></button>
-          <button class="btn ghost" id="fsBtn" title="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          <button class="btn ghost" id="fsBtn" title="Full screen (F)" aria-label="Full screen (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
           <button class="btn take" id="takeBtn"><svg viewBox="0 0 24 24"><path d="M9 3v9.6l-1.6-1.6a1.9 1.9 0 0 0-2.7 2.7l5.2 5.5A6 6 0 0 0 14.3 21H15a5 5 0 0 0 5-5v-4.5a1.75 1.75 0 0 0-3.5 0V11a1.75 1.75 0 0 0-3.5 0v-.5a1.75 1.75 0 0 0-3.5 0V3a1.75 1.75 0 0 0-3.5 0Z"/></svg><span id="takeText">Take over</span></button>
         </div>
       </div>
@@ -123,6 +123,7 @@
         <h2>Activity</h2>
         <div class="filters" id="filters">
           <button data-f="all" class="chip on">All</button>
+          <button data-f="shell" class="chip">Mac</button>
           <button data-f="nav" class="chip">Pages</button>
           <button data-f="error" class="chip">Errors <span class="count err" id="errCount" hidden>0</span></button>
           <button data-f="net" class="chip">Network</button>
@@ -142,6 +143,7 @@
   </div>
   <div class="toast" id="toast" hidden></div>
 </div>
+  <button class="fs-exit" id="fsExit" title="Exit full screen (F)" aria-label="Exit full screen"><svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><span>Exit full screen</span></button>
 <script src="app.js"></script>
 </body>
 </html>

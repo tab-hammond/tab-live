@@ -25,10 +25,27 @@ Hosted browser services give you a live view of the agent's session. Tab Live gi
 - **Rewind.** The last 15 minutes are kept in memory at 2 fps. Scrub back and play it at 1× to 16×.
 - **Take over.** View-only by default. Take over to forward clicks, typing, paste, scrolling and touch (tap to click, drag to scroll, plus an on-screen keyboard). You also get back, forward, reload and an address bar. Everyone watching sees who is in control, control returns automatically after 3 idle minutes, and the agent can check `takeover.json` (or `GET /api/takeover`) to pause itself while you drive.
 - **Whole desktop (optional).** A tiny helper app captures the agent user's entire screen, but only while someone has the Desktop view open.
-- **Built for the phone.** Dark, mobile-first PWA. Add it to your Home Screen and it opens full screen like an app. A full-screen mode works for landscape.
+- **Built for the phone.** Dark, mobile-first PWA. Add it to your Home Screen and it opens full screen like an app. A full-screen mode works for landscape. Press **F** to enter or leave it, or use the large **Exit full screen** button that stays in the top-right corner, so you never need the Escape key.
 - **Self-healing.** If the browser isn't running you get a calm idle screen, and it reconnects on its own when Chrome comes back. The server runs under launchd with KeepAlive.
 
 <p align="center"><img src="docs/rewind.jpg" alt="Rewind: scrubbing back through the last minutes" width="100%"></p>
+
+## Keyboard and accessibility
+
+- **F** toggles full screen. It's ignored while you type in a field, and while you're driving with the live view focused (then keys go to the agent's browser; use the button instead).
+- In full screen, a large **Exit full screen** button stays pinned to the top-right corner. Escape still works, but you never need it.
+
+## Agent activity notes
+
+Agents can add their own lines to the activity feed (shown with a **Mac** chip), so you see what they're doing outside the browser too:
+
+```bash
+curl -s -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"text":"Checking mail","sub":"himalaya envelope list","level":"info"}' \
+  http://127.0.0.1:8335/api/activity
+```
+
+`level` is `info` or `error`.
 
 ## How it works
 
@@ -103,6 +120,10 @@ The helper only captures while a viewer has the Desktop view open, plus one stil
 
 If the agent runs in its own macOS user, you can also use Apple Screen Sharing (System Settings → General → Sharing → Screen Sharing). Connect to `vnc://<address>`, sign in as the agent's user, and choose **Log in as yourself** if asked. That gives you the agent's own session instead of whoever is at the physical screen. Tab Live's Desktop view gives you a quick look; Screen Sharing gives you the full desktop.
 
+### Desktop view from the agent's own session (VNC)
+
+If the capture helper can't see the agent's session (for example the agent user isn't the one at the physical screen), `scripts/tl-desk.py` streams the agent user's own Screen Sharing session into the Desktop view instead. It connects to local Screen Sharing as the agent user (password read from `~/.config/tab-live/vnc.pw`, mode 600), writes `desktop.jpg` only while someone has the Desktop view open, and never attaches unless that user's own GUI session is running, so it can't mirror someone else's screen. Run it under launchd as the agent user (`pip3 install --user vncdotool` first).
+
 ## Configuration
 
 `~/.config/tab-live/config.json`. Each key can also be set with an environment variable `TAB_LIVE_<KEY>`.
@@ -123,6 +144,7 @@ If the agent runs in its own macOS user, you can also use Apple Screen Sharing (
 
 All routes except `/healthz` need `Authorization: Bearer <token>` (or `?t=`).
 
+- `POST /api/activity` — add a note to the feed: `{text, sub?, level?}`
 - `GET /api/state` — browser status, tabs, active tab, viewers, take-over
 - `GET /api/feed` — recent activity events
 - `GET /api/takeover` — `{active, by, since}`. Agents can poll this, or read `~/.config/tab-live/takeover.json`, to hold off while a human drives.

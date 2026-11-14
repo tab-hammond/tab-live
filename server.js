@@ -275,6 +275,15 @@ const server = http.createServer(async (req, res) => {
     if (throttled(ip)) return send(res, 429, { error: 'too many attempts' });
     if (!tokenOk(reqToken(req, url))) { noteFailure(ip); return send(res, 401, { error: 'token required' }); }
     failures.delete(ip);
+    if (p === '/api/activity' && req.method === 'POST') {
+      let body = '';
+      for await (const ch of req) { body += ch; if (body.length > 8192) break; }
+      let j = {}; try { j = JSON.parse(body); } catch {}
+      const ev = { ts: Date.now(), kind: 'shell', level: j.level === 'error' ? 'error' : 'info', text: String(j.text || '').slice(0, 200), sub: String(j.sub || '').slice(0, 300) };
+      if (!ev.text) return send(res, 400, { error: 'text required' });
+      watcher.emit('feed', ev);
+      return send(res, 200, { ok: true });
+    }
     if (p === '/api/state') return send(res, 200, stateMsg());
     if (p === '/api/feed') return send(res, 200, feed.slice(-500));
     if (p === '/api/takeover') return send(res, 200, takeover ? { active: true, by: takeover.label, since: takeover.since } : { active: false });

@@ -241,6 +241,7 @@
     if (S.filter === 'error') return e.level === 'error' || e.kind === 'console';
     if (S.filter === 'nav') return e.kind === 'nav' || e.kind === 'load' || e.kind === 'tab' || e.kind === 'takeover';
     if (S.filter === 'net') return e.kind === 'net';
+    if (S.filter === 'shell') return e.kind === 'shell';
     return true;
   }
   const ICONS = {
@@ -250,6 +251,7 @@
     net: '<svg viewBox="0 0 24 24"><path d="M7 4v13M3 13l4 4 4-4M17 20V7M13 11l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
     console: '<svg viewBox="0 0 24 24"><path d="M12 4v10M12 18v2" stroke="currentColor" stroke-width="3"/></svg>',
     takeover: '<svg viewBox="0 0 24 24"><path d="M9 3v10l-2-2a2 2 0 0 0-3 3l5 5a6 6 0 0 0 4 2h2a5 5 0 0 0 5-5v-4a2 2 0 0 0-4 0V9a2 2 0 0 0-4 0V3a2 2 0 0 0-3 0Z"/></svg>',
+    shell: '<svg viewBox="0 0 24 24"><path d="M4 7l5 5-5 5M12 18h8" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>',
     browser: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
   };
   function evEl(e) {
@@ -265,6 +267,7 @@
     }
     const t = e.targetId && S.state?.targets?.find((x) => x.id === e.targetId);
     if (t && e.kind === 'console') subs.push(esc(t.host || t.title));
+    if (e.kind === 'shell' && e.sub) subs.push(esc(e.sub));
     li.innerHTML = `<time data-ts="${e.ts}" title="${new Date(e.ts).toLocaleString()}">${clock(e.ts)}</time><span class="ic">${ICONS[e.kind] || ICONS.browser}</span><div class="body">${esc(e.text)}${subs.length ? `<div class="sub">${subs.join('<span>·</span>')}</div>` : ''}</div>`;
     if (e.url) li.title = e.url;
     if (e.targetId) li.addEventListener('click', () => S.state?.targets?.some((x) => x.id === e.targetId) && onTabClick(e.targetId));
@@ -314,12 +317,24 @@
   $('tabsPane').classList.add('mobile-hidden');
 
   // ---------------------------------------------------------------- full screen
-  $('fsBtn').addEventListener('click', () => {
-    const on = !document.body.classList.contains('fs');
+  function setFullscreen(on) {
     document.body.classList.toggle('fs', on);
     if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
     if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
     if (on) $('screenWrap').style.aspectRatio = ''; else if (canvas.width && window.innerWidth < 1000) $('screenWrap').style.aspectRatio = `${canvas.width} / ${canvas.height}`;
+  }
+  const toggleFullscreen = () => setFullscreen(!document.body.classList.contains('fs'));
+  $('fsBtn').addEventListener('click', toggleFullscreen);
+  $('fsExit').addEventListener('click', () => setFullscreen(false));
+  // F toggles full screen (no Escape needed). Ignored while typing in a field, or while you are
+  // driving with the live view focused, since then keys go to the agent's browser.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
+    if (S.driving && a === canvas) return;
+    e.preventDefault(); toggleFullscreen();
   });
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) document.body.classList.remove('fs'); });
 
