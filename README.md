@@ -45,7 +45,7 @@ curl -s -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   http://127.0.0.1:8335/api/activity
 ```
 
-`level` is `info` or `error`.
+`level` is `info` or `error`. Or use the helper: `scripts/tl-note "Checking mail" "himalaya envelope list"` (reads the token from `~/.config/tab-live/token` or `$TAB_LIVE_TOKEN`).
 
 ## How it works
 
@@ -105,6 +105,8 @@ Logs go to `~/Library/Logs/tab-live/`.
 
 Open `http://<address>:8335/#token=<token>`, then **Share → Add to Home Screen** on iPhone.
 
+On a Mac, `sudo ./scripts/make-launcher-app.sh <your-user>` puts a **Tab Live** app in /Applications that opens the viewer in its own window, already signed in. The token is baked in, so the app is readable only by that user.
+
 ### Desktop view: one permission
 
 macOS asks you to approve screen capture yourself; it won't show a prompt to a background helper. Do this once, on the Mac:
@@ -122,7 +124,7 @@ If the agent runs in its own macOS user, you can also use Apple Screen Sharing (
 
 ### Desktop view from the agent's own session (VNC)
 
-If the capture helper can't see the agent's session (for example the agent user isn't the one at the physical screen), `scripts/tl-desk.py` streams the agent user's own Screen Sharing session into the Desktop view instead. It connects to local Screen Sharing as the agent user (password read from `~/.config/tab-live/vnc.pw`, mode 600), writes `desktop.jpg` only while someone has the Desktop view open, and never attaches unless that user's own GUI session is running, so it can't mirror someone else's screen. Run it under launchd as the agent user (`pip3 install --user vncdotool` first).
+If the capture helper can't see the agent's session (for example the agent user isn't the one at the physical screen), `scripts/tl-desk.py` streams the agent user's own Screen Sharing session into the Desktop view instead. It connects to local Screen Sharing as the agent user (password read from `~/.config/tab-live/vnc.pw`, mode 600), writes `desktop.jpg` only while someone has the Desktop view open, and never attaches unless that user's own GUI session is running, so it can't mirror someone else's screen. Run it under launchd as the agent user (`pip3 install --user vncdotool` first): render `launchd/com.tablive.desktopstream.plist.template` (replace `__USER__`, `__HOME__`, `__APP_DIR__`, `__LOG_DIR__`) into `/Library/LaunchDaemons/` and `launchctl bootstrap system` it.
 
 ## Configuration
 

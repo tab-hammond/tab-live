@@ -1,0 +1,11 @@
+#!/bin/bash
+# tl-note "text" ["detail"] [error]  -- add a line to Tab Live's activity feed (shown with a Mac chip).
+# Token: $TAB_LIVE_TOKEN, else <config dir>/token. Server: $TAB_LIVE_URL (default http://127.0.0.1:8335).
+CFG="${TAB_LIVE_CONFIG_DIR:-$HOME/.config/tab-live}"
+TOK="${TAB_LIVE_TOKEN:-$(cat "$CFG/token" 2>/dev/null)}"; [ -n "$TOK" ] || exit 0
+URL="${TAB_LIVE_URL:-http://127.0.0.1:8335}"
+python3 - "$@" <<'PY' | curl -s -m 3 -H "Authorization: Bearer $TOK" -H 'Content-Type: application/json' --data-binary @- "$URL/api/activity" >/dev/null
+import json, sys
+a = sys.argv[1:] + ["", ""]
+print(json.dumps({"text": a[0], "sub": a[1], "level": "error" if len(a) > 2 and a[2] == "error" else "info"}))
+PY

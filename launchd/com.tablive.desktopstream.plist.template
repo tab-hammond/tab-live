@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Tab Live VNC desktop stream (optional). A LaunchDaemon that runs as the agent user and
+     streams that user's own Screen Sharing session into the Desktop view while someone watches.
+     Render: replace __USER__, __HOME__, __APP_DIR__, __LOG_DIR__; install to /Library/LaunchDaemons. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.tablive.desktopstream</string>
+  <key>UserName</key><string>__USER__</string>
+  <key>ProgramArguments</key>
+  <array><string>/usr/bin/python3</string><string>__APP_DIR__/scripts/tl-desk.py</string></array>
+  <key>EnvironmentVariables</key><dict><key>HOME</key><string>__HOME__</string><key>USER</key><string>__USER__</string></dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>15</integer>
+  <key>StandardOutPath</key><string>__LOG_DIR__/desktopstream.log</string>
+  <key>StandardErrorPath</key><string>__LOG_DIR__/desktopstream.log</string>
+</dict>
+</plist>

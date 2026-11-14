@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-# Streams the 'tab' user's own macOS session (via local Screen Sharing / VNC) into Tab Live's Desktop view.
+# Streams the agent user's own macOS session (via local Screen Sharing / VNC) into Tab Live's Desktop view.
 import os, time, io, traceback, logging
 logging.disable(logging.CRITICAL)
 import warnings; warnings.filterwarnings("ignore")
 from vncdotool import api
-D = "/Users/tab/.cache/tab-live"; JPG = os.path.join(D, "desktop.jpg"); WANT = os.path.join(D, "desktop.want")
-PWF = "/Users/tab/.config/tab-live/vnc.pw"
+HOME = os.path.expanduser("~")
+USER = os.environ.get("USER") or os.path.basename(HOME)
+D = os.path.join(HOME, ".cache/tab-live"); JPG = os.path.join(D, "desktop.jpg"); WANT = os.path.join(D, "desktop.want")
+PWF = os.path.join(os.environ.get("TAB_LIVE_CONFIG_DIR", os.path.join(HOME, ".config/tab-live")), "vnc.pw")
 os.makedirs(D, exist_ok=True)
 def watching():
     try: return time.time() - os.path.getmtime(WANT) < 15
@@ -14,11 +16,11 @@ while True:
     c = None
     # never attach unless tab's own GUI session exists (otherwise VNC would show Josh's console)
     import subprocess
-    if subprocess.run(["/usr/bin/pgrep","-u","tab","-x","Dock"],capture_output=True).returncode != 0:
+    if subprocess.run(["/usr/bin/pgrep","-u",USER,"-x","Dock"],capture_output=True).returncode != 0:
         time.sleep(10); continue
     try:
         pw = open(PWF).read().strip()
-        c = api.connect("127.0.0.1::5900", username="tab", password=pw, timeout=30)
+        c = api.connect("127.0.0.1::5900", username=USER, password=pw, timeout=30)
         c.refreshScreen(incremental=False)
         last = 0
         idle_since = None
